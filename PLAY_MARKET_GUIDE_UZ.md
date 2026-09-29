@@ -1,90 +1,90 @@
-# 📱 Google Play Marketga Chiqarish Bo'yicha Mukammal Yo'riqnoma — Zolotoy Tour
+# 📱 Google Play Marketga Chiqarish Bo'yicha Mukammal Yo'riqnoma (2026-yil Talablari Asosida) — Zolotoy Tour
 
-Ushbu qo'llanma **Zolotoy Tour** mobil ilovasini Google Play Console orqali Google Play Marketga muvaffaqiyatli yuklash va moderatsiyadan o'tkazish uchun barcha tayyor fayllar, qadam-baqadam ko'rsatmalar va zarur matnlarni o'z ichiga oladi.
+Ushbu hujjat **Zolotoy Tour** mobil ilovasini Google Play Store platformasiga eng so'nggi (2026-yilgi) qat'iy qoidalarga to'liq muvofiq holda chiqarish bo'yicha amaliy qo'llanmadir.
 
 ---
 
-## 🗂 1. Loyihada To'liq Tayyorlab Qo'yilgan Fayllar
+## 🔍 1. Texnik Ko'rsatkichlar va Tekshiruv Natijalari (Audit)
 
-Barcha texnik va vizual materiallar to'liq tayyorlangan va loyihada joylashgan:
+Loyiha build konfiguratsiyasi tekshirildi va quyidagi parametrlar tasdiqlandi:
 
-| Fayl turi | Fayl joylashuvi | Maqsadi |
+| Parametr | Qiymati | Holati |
 | :--- | :--- | :--- |
-| **Android App Bundle (.aab)** | [app-release.aab](file:///c:/Users/Asia%20Electronics/Desktop/projects/zolotoytour/build/app/outputs/bundle/release/app-release.aab) | Play Console'ga yuklanadigan asosiy imzolangan reliz fayli (~41.5 MB) |
-| **De-obfuscation (mapping.txt)** | [mapping.txt](file:///c:/Users/Asia%20Electronics/Desktop/projects/zolotoytour/build/app/outputs/mapping/release/mapping.txt) | R8 siqishdan keyingi koddagi xatolarni o'qish fayli |
-| **Do'kon Ikonkasi (512x512 PNG)** | [icon_512x512.png](file:///c:/Users/Asia%20Electronics/Desktop/projects/zolotoytour/store_assets/icon_512x512.png) | Google Play Store listing uchun rasmiy belgilangan o'lchamdagi belgi |
-| **Asosiy Banner (1024x500 PNG)** | [feature_graphic_1024x500.png](file:///c:/Users/Asia%20Electronics/Desktop/projects/zolotoytour/store_assets/feature_graphic_1024x500.png) | Play Market qidiruv va do'kon sahifasi tepasidagi majburiy banner |
-| **Skrinshot 1 (Bosh sahifa)** | [screenshot_1_home.png](file:///c:/Users/Asia%20Electronics/Desktop/projects/zolotoytour/store_assets/screenshot_1_home.png) | 1080x2400 (9:16) yuqori sifatli vizual taqdimot |
-| **Skrinshot 2 (Turlar qidiruvi)** | [screenshot_2_tours.png](file:///c:/Users/Asia%20Electronics/Desktop/projects/zolotoytour/store_assets/screenshot_2_tours.png) | 1080x2400 (9:16) tur tanlash sahifasi |
-| **Skrinshot 3 (Qaynoq turlar)** | [screenshot_3_hot_tours.png](file:///c:/Users/Asia%20Electronics/Desktop/projects/zolotoytour/store_assets/screenshot_3_hot_tours.png) | 1080x2400 (9:16) qaynoq turlar taqdimoti |
-| **Skrinshot 4 (Xizmatlarimiz)** | [screenshot_4_services.png](file:///c:/Users/Asia%20Electronics/Desktop/projects/zolotoytour/store_assets/screenshot_4_services.png) | 1080x2400 (9:16) viza va aviachiptalar xizmati |
-| **Skrinshot 5 (Aloqa va manzil)** | [screenshot_5_contacts.png](file:///c:/Users/Asia%20Electronics/Desktop/projects/zolotoytour/store_assets/screenshot_5_contacts.png) | 1080x2400 (9:16) mijozlar xizmati va ofis manzili |
-| **Maxfiylik Siyosati (HTML)** | [PRIVACY_POLICY.html](file:///c:/Users/Asia%20Electronics/Desktop/projects/zolotoytour/store_assets/PRIVACY_POLICY.html) | Ikki tilli (O'zbek / Rus) rasmiy maxfiylik hujjati |
-| **Imzo Kaliti (Keystore)** | [zolotoytour-release.jks](file:///c:/Users/Asia%20Electronics/Desktop/projects/zolotoytour/android/keystore/zolotoytour-release.jks) | Parol: `ZolotoyTour2026!SecureKey` (Alias: `zolotoytour`) |
+| **Package ID** | `com.zolotoytouruz.app` | ✅ To'g'ri sozlangan |
+| **Target SDK** | **Android 16 (API 36)** | ✅ 2026-yilgi eng so'nggi Google Play talabiga to'liq mos |
+| **Min SDK** | `API 24` (Android 7.0+) | ✅ Barcha zamonaviy qurilmalarni qamrab oladi |
+| **Format** | Android App Bundle (`.aab`) | ✅ Google Play talabi bo'yicha tayyor |
+| **Ruxsatnomalar (Permissions)** | Faqat `INTERNET` va `ACCESS_NETWORK_STATE` | ✅ Xavfli/maxfiy tizim ruxsatlari yo'q |
+| **Kod himoyasi (R8/ProGuard)** | `isMinifyEnabled = true`, `isShrinkResources = true` | ✅ Kod siqilgan va optimallashtirilgan |
 
 ---
 
-## ⚠️ 2. Google Play Siyosati: Akkaunt Turini Tekshirish (Muhim!)
+## 🗂 2. Loyihadagi Tayyor Materiallar
 
-Google Play 2023-yil 13-noyabrdan boshlab yangi qoida joriy qilgan:
-- **Tashkilot (Organization) akkaunti bo'lsa:** Ilovani to'g'ridan-to'g'ri **Production (Ochiq reliz)** ga chiqarish mumkin.
-- **Jismoniy shaxs (Personal) yangi akkaunti bo'lsa:** Ilovani asosiy bozorga chiqarishdan oldin **Closed Testing (Yopiq test)** bo'limida kamida **20 nafar testlovchi (testers)** ilovaga 14 kun davomida a'zo bo'lib turishi talab qilinadi. Shundan so'ng "Apply for production" tugmasi ochiladi.
+| Fayl turi | Manzili | Izoh |
+| :--- | :--- | :--- |
+| **Android App Bundle (.aab)** | [app-release.aab](file:///c:/Users/Asia%20Electronics/Desktop/projects/zolotoytour/build/app/outputs/bundle/release/app-release.aab) | Play Console'ga yuklanadigan asosiy fayl (~41.5 MB) |
+| **De-obfuscation (mapping.txt)** | [mapping.txt](file:///c:/Users/Asia%20Electronics/Desktop/projects/zolotoytour/build/app/outputs/mapping/release/mapping.txt) | R8 siqish xatolarini o'qish fayli |
+| **Do'kon Ikonkasi (512x512 PNG)** | [icon_512x512.png](file:///c:/Users/Asia%20Electronics/Desktop/projects/zolotoytour/store_assets/icon_512x512.png) | Play Store uchun rasmiy o'lchamdagi belgi |
+| **Asosiy Banner (1024x500 PNG)** | [feature_graphic_1024x500.png](file:///c:/Users/Asia%20Electronics/Desktop/projects/zolotoytour/store_assets/feature_graphic_1024x500.png) | Play Market qidiruv va do'kon sahifasi banneri |
+| **5 ta Skrinshot (1080x2400 PNG)** | [store_assets/](file:///c:/Users/Asia%20Electronics/Desktop/projects/zolotoytour/store_assets) | 9:16 nisbatdagi tayyor reklama skrinshotlari |
+| **Domen Huquqi Vakolatnomasi** | [DOMAIN_AUTHORIZATION_LETTER.md](file:///c:/Users/Asia%20Electronics/Desktop/projects/zolotoytour/store_assets/DOMAIN_AUTHORIZATION_LETTER.md) | WebView siyosati uchun rasmiy tasdiqnoma hujjati |
+| **Maxfiylik Siyosati (HTML)** | [docs/index.html](file:///c:/Users/Asia%20Electronics/Desktop/projects/zolotoytour/docs/index.html) | Jonli HTTPS sahifasi uchun tayyorlangan hujjat |
 
 ---
 
-## 📝 3. Qadam-baqadam Google Play Console Yo'riqnomasi
+## ⚠️ 3. 2026-yilgi Muhim Qoidalar va Ehtiyot Choralari
+
+### A. Domen va WebView Siyosati (Webviews and Affiliate Spam)
+Google Play o'zganing veb-saytini ruxsatsiz WebView qilib chiqarishni taqiqlaydi. Buni oldini olish uchun:
+1. Loyihada tayyorlab qo'yilgan [DOMAIN_AUTHORIZATION_LETTER.md](file:///c:/Users/Asia%20Electronics/Desktop/projects/zolotoytour/store_assets/DOMAIN_AUTHORIZATION_LETTER.md) hujjatini kompaniya rahbari imzosi va muhri bilan to'ldirib oling.
+2. Google Play Console'da **App content** > **Advance notice to Google Play** bo'limida ushbu xatni va domen boshqaruvi skrinshotini oldindan ilova qilib yuboring. Bu moderatsiyadan 100% muammosiz o'tishni kafolatlaydi.
+
+### B. Akkaunt Turi va 12 Tester Qoidasi:
+- **Tashkilot (Organization) akkaunti:** Agar akkaunt kompaniya (yuridik shaxs) nomiga ochilgan bo'lsa (D-U-N-S raqami bilan tasdiqlangan), ilovani darhol **Production (Ochiq reliz)** ga chiqarish mumkin.
+- **Shaxsiy (Personal) yangi akkaunt:** 2023-yil 13-noyabrdan keyin ochilgan shaxsiy akkauntlarda Production'dan oldin:
+  👉 **Kamida 12 nafar testlovchi (testers)** ilovaga a'zo bo'lib, **kamida 14 kun uzluksiz** Closed Testing'da turishi kerak. Shundan keyin "Apply for production" tugmasi orqali ochiq bozorga ruxsat so'raladi.
+
+### C. Jonli HTTPS Maxfiylik Siyosati (Privacy Policy URL):
+Google Play lokal faylni qabul qilmaydi, ochiq ishlaydigan HTTPS URL talab qiladi.
+Ikkita qulay yechim mavjud:
+- **1-variant (Asosiy saytda):** `store_assets/PRIVACY_POLICY.html` faylini saytingiz serveriga yuklab, havolasini `https://www.zolotoytouruz.uz/privacy` qilib oling.
+- **2-variant (GitHub Pages orqali bir zumda):** Repozitoriyangizdagi [`docs/index.html`](file:///c:/Users/Asia%20Electronics/Desktop/projects/zolotoytour/docs/index.html) faylini GitHub Pages orqali yoqing:
+  * GitHub repo sozlamalariga kiring: **Settings** > **Pages** > Branch: **main**, Folder: **/docs** > Save.
+  * Sizda bepul, ochiq va doimiy HTTPS havola tayyor bo'ladi: `https://bergamp89-glitch.github.io/ZolotoyTour/`.
+
+### D. Data Safety (Ma'lumotlar xavfsizligi) — To'g'ri to'ldirish tartibi:
+Saytdagi tur bron qilish formasi orqali foydalanuvchilar ism va telefon kiritishi sababli, Google talabi bo'yicha Data Safety bo'limida quyidagicha to'ldiriladi:
+- **Does your app collect or share any user data?** -> **Yes**
+- **Is all of the user data collected by your app encrypted in transit?** -> **Yes** (HTTPS)
+- **Do you provide a way for users to request that their data be deleted?** -> **Yes** (Email: `zolotoytouruz@gmail.com`)
+- **Qaysi ma'lumotlar to'planadi?**
+  * **Personal info -> Name (Ism):** Collected (To'planadi), Purpose: **App functionality** (Buyurtmalarni qayta ishlash), Ephemeral emas.
+  * **Personal info -> Phone number (Telefon raqam):** Collected, Purpose: **App functionality / Account management** (Mijoz bilan aloqa).
+  * Uchinchi shaxslarga berilmaydi (Not shared with 3rd parties).
+
+---
+
+## 📝 4. Qadam-baqadam Google Play Console Yo'riqnomasi
 
 ### 1-QADAM: Yangi ilova yaratish
 1. [Google Play Console](https://play.google.com/console) saytiga kiring.
-2. O'ng yuqoridagi **"Create app"** (Ilova yaratish) tugmasini bosing:
+2. **"Create app"** tugmasini bosing:
    - **App name:** `Zolotoy Tour`
    - **Default language:** `Russian` yoki `Uzbek`
    - **App or game:** `App`
-   - **Free or paid:** `Free` (Bepul)
-   - Qoidalarga rozilik belgilarini qo'yib, **"Create app"** ni bosing.
+   - **Free or paid:** `Free`
 
 ---
 
-### 2-QADAM: Ilova Tarkibi va Xavfsizlik So'rovnomasi (App content)
-Chap menyudan **"App content"** bo'limiga kiring va quyidagi vazifalarni bajaring:
-
-1. **Privacy Policy (Maxfiylik siyosati):**
-   - Veb-saytdagi havolani ko'rsating: masalan `https://www.zolotoytouruz.uz/kontakty` yoki yuqoridagi [PRIVACY_POLICY.html](file:///c:/Users/Asia%20Electronics/Desktop/projects/zolotoytour/store_assets/PRIVACY_POLICY.html) faylini saytingizga `https://www.zolotoytouruz.uz/privacy` qilib joylashtiring va shu havolani yozing.
-2. **App access (Ilovaga kirish huquqi):**
-   - *"All functionality is available without special access"* (Barcha funksiyalar cheklovlarsiz va parolsiz ochiq).
-3. **Ads (Reklama):**
-   - *"No, my app does not contain ads"* (Ilovada reklama yo'q).
-4. **Content rating (Yosh chegarasi so'rovnomasi):**
-   - Emailingizni kiriting (`zolotoytouruz@gmail.com`).
-   - Kategoriya: **Utility, Productivity, Communication or Other** (yoki Travel).
-   - Zo'ravonlik, qimor, nomaqbul so'zlar: barchasiga **"No"**.
-   - Natija: **Everyone (3+) / PEGI 3** chiqadi. Tasdiqlang.
-5. **Target audience (Maqsadli auditoriya):**
-   - Yosh: **18 and over** (yoki 13-17, 18+).
-   - Bolalar uchun maxsus mo'ljallanganmi: **"No"**.
-6. **News apps (Yangiliklar):**
-   - *"No"* (Ilova yangiliklar nashri emas).
-7. **COVID-19 contact tracing:**
-   - *"No"*.
-8. **Data safety (Ma'lumotlar xavfsizligi):**
-   - *"Does your app collect or share any user data?"* -> **No** (Ilovada shaxsiy ma'lumotlarni o'g'irlovchi SDK yoki tahliliy trekerlar mavjud emas. Sayt formasi orqali kiritilgan ma'lumotlar faqat mijoz bilan bog'lanish uchun ishlatiladi).
-   - *"Is all user data collected by your app encrypted in transit?"* -> **Yes** (HTTPS orqali to'liq shifrlangan).
-9. **Financial features:**
-   - Ilova bank yoki kredit ilovasi emas (*"My app doesn't provide any financial features"*).
-10. **Government apps:**
-    - Davlat organi ilovasi emas (*"No"*).
-
----
-
-### 3-QADAM: Do'kon Sahifasini To'ldirish (Main store listing)
-
-Chap menyudan **"Grow"** > **"Store presence"** > **"Main store listing"** bo'limiga o'ting:
+### 2-QADAM: Do'kon Sahifasini To'ldirish (Main store listing)
+**"Grow"** > **"Store presence"** > **"Main store listing"** bo'limida:
 
 #### Matnlar:
 - **App name:** `Zolotoy Tour`
-- **Short description (Qisqa tavsif — 80 belgigacha):**
-  * Ruscha: `Бронирование туров, горящие путевки и путешествия по миру с Zolotoy Tour.`
-  * O'zbekcha: `Zolotoy Tour bilan dunyo bo'ylab unutilmas sayohatlar va qaynoq turlar.`
+- **Short description (80 belgigacha):**
+  * Ruscha: `Бронируйте туры, находите горящие предложения и путешествуйте с Zolotoy Tour.`
+  * O'zbekcha: `Zolotoy Tour bilan turlarni toping, sayohatni tanlang va buyurtma qiling.`
 - **Full description (To'liq tavsif):**
 ```text
 Zolotoy Tour — sizning ishonchli sayohat hamkoringiz!
@@ -107,37 +107,36 @@ Veb-sayt: https://www.zolotoytouruz.uz/
 ```
 
 #### Grafik fayllarni yuklash:
-1. **App icon:** `store_assets/icon_512x512.png` faylini yuklang.
-2. **Feature graphic:** `store_assets/feature_graphic_1024x500.png` faylini yuklang.
-3. **Phone screenshots:** Quyidagi 5 ta skrinshotni ketma-ket yuklang:
-   - `store_assets/screenshot_1_home.png`
-   - `store_assets/screenshot_2_tours.png`
-   - `store_assets/screenshot_3_hot_tours.png`
-   - `store_assets/screenshot_4_services.png`
-   - `store_assets/screenshot_5_contacts.png`
+- **App icon:** [`store_assets/icon_512x512.png`](file:///c:/Users/Asia%20Electronics/Desktop/projects/zolotoytour/store_assets/icon_512x512.png)
+- **Feature graphic:** [`store_assets/feature_graphic_1024x500.png`](file:///c:/Users/Asia%20Electronics/Desktop/projects/zolotoytour/store_assets/feature_graphic_1024x500.png)
+- **Phone screenshots:** [`store_assets/`](file:///c:/Users/Asia%20Electronics/Desktop/projects/zolotoytour/store_assets) papkasidagi 5 ta skrinshot.
 
 ---
 
-### 4-QADAM: App Bundle (.aab) Faylini Yuklash va Chiqarish
+### 3-QADAM: Ilova Tarkibi (App content)
+- **Privacy Policy:** Jonli HTTPS URL (saytingizdagi yoki GitHub Pages'dagi havola).
+- **App access:** *"All functionality is available without special access"*.
+- **Ads:** *"No, my app does not contain ads"*.
+- **Content rating:** IARC so'rovnomasi (yosh chegarasi 3+ / Everyone).
+- **Target audience:** 18+ (yoki 13+).
+- **Data safety:** Yuqoridagi 3-bo'lim D-bandida ko'rsatilganidek (Ism va telefon raqami).
+- **Financial / Health / Government apps:** Barchasiga "No".
 
-1. Chap menyudan **"Release"** > **"Production"** bo'limiga kiring (yoki shaxsiy akkaunt bo'lsa **"Closed testing"** ga).
-2. O'ng yuqoridagi **"Create new release"** (Yangi reliz yaratish) tugmasini bosing.
-3. **App bundles** bo'limidagi **"Upload"** tugmasini bosing va quyidagi faylni tanlang:
-   👉 `build/app/outputs/bundle/release/app-release.aab`
-4. **Release name:** Avtomatik `1.0.0 (1)` deb aniqlanadi.
-5. **Release notes (Reliz yangiliklari):**
+---
+
+### 4-QADAM: Reliz Yuklash va Tarqatish
+
+1. Akkauntingiz turiga qarab:
+   - Agar tashkilot bo'lsa: **Production** > **Create new release**.
+   - Agar shaxsiy bo'lsa: **Closed testing** > **Create new release** (12 tester bilan 14 kunlik test).
+2. **App bundle** joyiga yuklang:
+   👉 [`build/app/outputs/bundle/release/app-release.aab`](file:///c:/Users/Asia%20Electronics/Desktop/projects/zolotoytour/build/app/outputs/bundle/release/app-release.aab)
+3. **Release notes:**
    ```text
    Первый официальный релиз мобильного приложения Zolotoy Tour.
-   - Удобный поиск туров
+   - Поиск и бронирование туров
    - Горящие предложения
    - Визовая поддержка и связь с агентством
    ```
-6. Pastdagi **"Save"** va so'ngra **"Next"** (Keyingisi) tugmasini bosing.
-7. Xatolar yo'qligini tekshiring va **"Save and publish"** (yoki **"Start rollout to Production"**) tugmasini bosing.
-
----
-
-## ⏱ 4. Moderatsiya va Natija
-
-- Google tekshiruv guruhi ilovani odatda **24 soatdan 3 ish kunigacha** bo'lgan muddatda tekshirib chiqadi.
-- Moderatsiyadan muvaffaqiyatli o'tgach, ilovangiz Google Play Marketda barcha foydalanuvchilar uchun ochiq bo'ladi va o'rnatish uchun havola paydo bo'ladi.
+4. **Save** va **Start rollout** tugmasini bosing.
+5. Google moderatsiyasi odatda **24 soatdan 3 ish kunigacha** davom etadi.
