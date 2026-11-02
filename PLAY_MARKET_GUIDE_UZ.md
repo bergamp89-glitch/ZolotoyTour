@@ -1,4 +1,4 @@
-# 📱 Google Play Marketga Chiqarish Bo'yicha Mukammal Yo'riqnoma (2026-yil Talablari Asosida) — Zolotoy Tour
+﻿# 📱 Google Play Marketga Chiqarish Bo'yicha Mukammal Yo'riqnoma (2026-yil Talablari Asosida) — Zolotoy Tour
 
 Ushbu hujjat **Zolotoy Tour** mobil ilovasini Google Play Store platformasiga eng so'nggi (2026-yilgi) qat'iy qoidalarga to'liq muvofiq holda chiqarish bo'yicha amaliy qo'llanmadir.
 
@@ -23,13 +23,13 @@ Loyiha build konfiguratsiyasi tekshirildi va quyidagi parametrlar tasdiqlandi:
 
 | Fayl turi | Manzili | Izoh |
 | :--- | :--- | :--- |
-| **Android App Bundle (.aab)** | [app-release.aab](file:///c:/Users/Asia%20Electronics/Desktop/projects/zolotoytour/build/app/outputs/bundle/release/app-release.aab) | Play Console'ga yuklanadigan asosiy fayl (~41.5 MB) |
-| **De-obfuscation (mapping.txt)** | [mapping.txt](file:///c:/Users/Asia%20Electronics/Desktop/projects/zolotoytour/build/app/outputs/mapping/release/mapping.txt) | R8 siqish xatolarini o'qish fayli |
-| **Do'kon Ikonkasi (512x512 PNG)** | [icon_512x512.png](file:///c:/Users/Asia%20Electronics/Desktop/projects/zolotoytour/store_assets/icon_512x512.png) | Play Store uchun rasmiy o'lchamdagi belgi |
-| **Asosiy Banner (1024x500 PNG)** | [feature_graphic_1024x500.png](file:///c:/Users/Asia%20Electronics/Desktop/projects/zolotoytour/store_assets/feature_graphic_1024x500.png) | Play Market qidiruv va do'kon sahifasi banneri |
-| **5 ta Skrinshot (1080x2400 PNG)** | [store_assets/](file:///c:/Users/Asia%20Electronics/Desktop/projects/zolotoytour/store_assets) | 9:16 nisbatdagi tayyor reklama skrinshotlari |
-| **Domen Huquqi Vakolatnomasi** | [DOMAIN_AUTHORIZATION_LETTER.md](file:///c:/Users/Asia%20Electronics/Desktop/projects/zolotoytour/store_assets/DOMAIN_AUTHORIZATION_LETTER.md) | WebView siyosati uchun rasmiy tasdiqnoma hujjati |
-| **Maxfiylik Siyosati (HTML)** | [docs/index.html](file:///c:/Users/Asia%20Electronics/Desktop/projects/zolotoytour/docs/index.html) | Jonli HTTPS sahifasi uchun tayyorlangan hujjat |
+| **Android App Bundle (.aab)** | [app-release.aab](build/app/outputs/bundle/release/app-release.aab) | Play Console'ga yuklanadigan asosiy fayl (~41.5 MB) |
+| **De-obfuscation (mapping.txt)** | [mapping.txt](build/app/outputs/mapping/release/mapping.txt) | R8 siqish xatolarini o'qish fayli |
+| **Do'kon Ikonkasi (512x512 PNG)** | [icon_512x512.png](store_assets/icon_512x512.png) | Play Store uchun rasmiy o'lchamdagi belgi |
+| **Asosiy Banner (1024x500 PNG)** | [feature_graphic_1024x500.png](store_assets/feature_graphic_1024x500.png) | Play Market qidiruv va do'kon sahifasi banneri |
+| **5 ta Skrinshot (1080x2400 PNG)** | [store_assets/](store_assets) | 9:16 nisbatdagi tayyor reklama skrinshotlari |
+| **Domen Huquqi Vakolatnomasi** | [DOMAIN_AUTHORIZATION_LETTER.md](store_assets/DOMAIN_AUTHORIZATION_LETTER.md) | WebView siyosati uchun rasmiy tasdiqnoma hujjati |
+| **Maxfiylik Siyosati (HTML)** | [docs/index.html](docs/index.html) | Jonli HTTPS sahifasi uchun tayyorlangan hujjat |
 
 ---
 
@@ -37,7 +37,7 @@ Loyiha build konfiguratsiyasi tekshirildi va quyidagi parametrlar tasdiqlandi:
 
 ### A. Domen va WebView Siyosati (Webviews and Affiliate Spam)
 Google Play o'zganing veb-saytini ruxsatsiz WebView qilib chiqarishni taqiqlaydi. Buni oldini olish uchun:
-1. Loyihada tayyorlab qo'yilgan [DOMAIN_AUTHORIZATION_LETTER.md](file:///c:/Users/Asia%20Electronics/Desktop/projects/zolotoytour/store_assets/DOMAIN_AUTHORIZATION_LETTER.md) hujjatini kompaniya rahbari imzosi va muhri bilan to'ldirib oling.
+1. Loyihada tayyorlab qo'yilgan [DOMAIN_AUTHORIZATION_LETTER.md](store_assets/DOMAIN_AUTHORIZATION_LETTER.md) hujjatini kompaniya rahbari imzosi va muhri bilan to'ldirib oling.
 2. Google Play Console'da **App content** > **Advance notice to Google Play** bo'limida ushbu xatni va domen boshqaruvi skrinshotini oldindan ilova qilib yuboring. Bu moderatsiyadan 100% muammosiz o'tishni kafolatlaydi.
 
 ### B. Akkaunt Turi va 12 Tester Qoidasi:
@@ -49,7 +49,7 @@ Google Play o'zganing veb-saytini ruxsatsiz WebView qilib chiqarishni taqiqlaydi
 Google Play lokal faylni qabul qilmaydi, ochiq ishlaydigan HTTPS URL talab qiladi.
 Ikkita qulay yechim mavjud:
 - **1-variant (Asosiy saytda):** `store_assets/PRIVACY_POLICY.html` faylini saytingiz serveriga yuklab, havolasini `https://www.zolotoytouruz.uz/privacy` qilib oling.
-- **2-variant (GitHub Pages orqali bir zumda):** Repozitoriyangizdagi [`docs/index.html`](file:///c:/Users/Asia%20Electronics/Desktop/projects/zolotoytour/docs/index.html) faylini GitHub Pages orqali yoqing:
+- **2-variant (GitHub Pages orqali bir zumda):** Repozitoriyangizdagi [`docs/index.html`](docs/index.html) faylini GitHub Pages orqali yoqing:
   * GitHub repo sozlamalariga kiring: **Settings** > **Pages** > Branch: **main**, Folder: **/docs** > Save.
   * Sizda bepul, ochiq va doimiy HTTPS havola tayyor bo'ladi: `https://bergamp89-glitch.github.io/ZolotoyTour/`.
 
@@ -107,9 +107,9 @@ Veb-sayt: https://www.zolotoytouruz.uz/
 ```
 
 #### Grafik fayllarni yuklash:
-- **App icon:** [`store_assets/icon_512x512.png`](file:///c:/Users/Asia%20Electronics/Desktop/projects/zolotoytour/store_assets/icon_512x512.png)
-- **Feature graphic:** [`store_assets/feature_graphic_1024x500.png`](file:///c:/Users/Asia%20Electronics/Desktop/projects/zolotoytour/store_assets/feature_graphic_1024x500.png)
-- **Phone screenshots:** [`store_assets/`](file:///c:/Users/Asia%20Electronics/Desktop/projects/zolotoytour/store_assets) papkasidagi 5 ta skrinshot.
+- **App icon:** [`store_assets/icon_512x512.png`](store_assets/icon_512x512.png)
+- **Feature graphic:** [`store_assets/feature_graphic_1024x500.png`](store_assets/feature_graphic_1024x500.png)
+- **Phone screenshots:** [`store_assets/`](store_assets) papkasidagi 5 ta skrinshot.
 
 ---
 
@@ -130,7 +130,7 @@ Veb-sayt: https://www.zolotoytouruz.uz/
    - Agar tashkilot bo'lsa: **Production** > **Create new release**.
    - Agar shaxsiy bo'lsa: **Closed testing** > **Create new release** (12 tester bilan 14 kunlik test).
 2. **App bundle** joyiga yuklang:
-   👉 [`build/app/outputs/bundle/release/app-release.aab`](file:///c:/Users/Asia%20Electronics/Desktop/projects/zolotoytour/build/app/outputs/bundle/release/app-release.aab)
+   👉 [`build/app/outputs/bundle/release/app-release.aab`](build/app/outputs/bundle/release/app-release.aab)
 3. **Release notes:**
    ```text
    Первый официальный релиз мобильного приложения Zolotoy Tour.

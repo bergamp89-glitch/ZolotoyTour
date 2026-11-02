@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
@@ -41,8 +41,6 @@
 	<string>Приложению требуется доступ к камере для загрузки документов и фотографий при бронировании туров.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Приложению требуется доступ к фотогалерее для выбора и загрузки документов при бронировании туров.</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>Приложению требуется доступ к микрофону для аудиосообщений и связи со службой поддержки.</string>
 
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
