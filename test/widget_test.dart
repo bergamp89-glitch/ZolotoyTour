@@ -25,7 +25,7 @@ void main() {
       expect(AppConfig.telegramUrl, equals('https://t.me/zolotoy_tour'));
       expect(AppConfig.officeAddress, contains('Наманган'));
       expect(AppConfig.workingHours, contains('09:00'));
-      expect(AppConfig.pageTimeout, equals(const Duration(seconds: 25)));
+      expect(AppConfig.pageTimeout, equals(const Duration(seconds: 35)));
     });
 
     test('UrlHandler correctly identifies internal vs external URLs', () {

@@ -54,5 +54,9 @@ class AppConfig {
   static const String workingHours = 'Пн–Сб: 09:00 – 19:00';
 
   /// Network loading timeout for page requests.
-  static const Duration pageTimeout = Duration(seconds: 25);
+  static const Duration pageTimeout = Duration(seconds: 35);
+
+  /// Modern mobile User-Agent string to ensure full compatibility with CDNs, DDoS protection and map services.
+  static const String customUserAgent =
+      'Mozilla/5.0 (Linux; Android 14; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.6613.127 Mobile Safari/537.36';
 }

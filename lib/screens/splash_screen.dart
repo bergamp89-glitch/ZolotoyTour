@@ -3,7 +3,6 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../config/app_config.dart';
-import 'webview_screen.dart';
 
 /// Premium travel/tourism-themed luxury Splash Screen for Zolotoy Tour.
 /// Features:
@@ -124,33 +123,7 @@ class _SplashScreenState extends State<SplashScreen>
     if (_hasNavigated || !mounted) return;
     _hasNavigated = true;
     _fallbackTimer?.cancel();
-
-    if (widget.onFinished != null) {
-      widget.onFinished!();
-      return;
-    }
-
-    Navigator.of(context).pushReplacement(
-      PageRouteBuilder<void>(
-        pageBuilder: (BuildContext context, Animation<double> animation,
-            Animation<double> secondaryAnimation) {
-          return const WebViewScreen();
-        },
-        transitionsBuilder: (BuildContext context,
-            Animation<double> animation,
-            Animation<double> secondaryAnimation,
-            Widget child) {
-          return FadeTransition(
-            opacity: CurvedAnimation(
-              parent: animation,
-              curve: Curves.easeOut,
-            ),
-            child: child,
-          );
-        },
-        transitionDuration: const Duration(milliseconds: 300),
-      ),
-    );
+    widget.onFinished?.call();
   }
 
   @override

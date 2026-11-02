@@ -3,9 +3,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:webview_flutter_android/webview_flutter_android.dart';
 import '../config/app_config.dart';
 import '../utils/url_handler.dart';
 import '../widgets/app_bottom_nav_bar.dart';
+import '../widgets/web_view_fallback.dart';
 import 'error_screen.dart';
 import 'splash_screen.dart';
 
@@ -39,12 +41,9 @@ class _WebViewScreenState extends State<WebViewScreen> {
   Timer? _maxSplashTimer;
   Timer? _renderBufferTimer;
   DateTime? _lastBackPressTime;
-  bool _backgroundPreloadStarted = false;
-  int _nextPreloadIndex = 1;
-  Timer? _backgroundPreloadTimer;
 
   /// Detects whether the current environment is a desktop OS (Windows, macOS, Linux).
-  bool get _isDesktopPlatform {
+  bool get _isPureDesktopPlatform {
     if (kIsWeb) return false;
     return defaultTargetPlatform == TargetPlatform.windows ||
         defaultTargetPlatform == TargetPlatform.linux ||
@@ -54,8 +53,11 @@ class _WebViewScreenState extends State<WebViewScreen> {
   @override
   void initState() {
     super.initState();
-    if (_isDesktopPlatform) {
+    if (_isPureDesktopPlatform) {
       _isWebViewSupported = false;
+      _showSplash = false;
+    } else if (kIsWeb) {
+      _isWebViewSupported = true;
       _showSplash = false;
     } else {
       // Step 1: Preload ONLY the main Home tab (index 0) during the splash screen.
@@ -84,7 +86,6 @@ class _WebViewScreenState extends State<WebViewScreen> {
     _minSplashTimer?.cancel();
     _maxSplashTimer?.cancel();
     _renderBufferTimer?.cancel();
-    _backgroundPreloadTimer?.cancel();
     for (final Timer timer in _tabTimeoutTimers.values) {
       timer.cancel();
     }
@@ -99,7 +100,7 @@ class _WebViewScreenState extends State<WebViewScreen> {
 
   /// Lazy-initializes and caches a WebViewController for a given bottom nav tab index.
   WebViewController? _initTabController(int index) {
-    if (_isDesktopPlatform) return null;
+    if (_isPureDesktopPlatform || kIsWeb) return null;
     if (_tabInitialized.contains(index) && _controllers.containsKey(index)) {
       return _controllers[index];
     }
@@ -113,113 +114,118 @@ class _WebViewScreenState extends State<WebViewScreen> {
       final WebViewController controller = WebViewController();
 
       if (!kIsWeb) {
+        final NavigationDelegate navDelegate = NavigationDelegate(
+          onProgress: (int progress) {
+            _tabProgress[index]?.value = progress;
+            if (progress >= 100 && (_tabIsLoading[index]?.value ?? false)) {
+              _tabIsLoading[index]?.value = false;
+            }
+          },
+          onPageStarted: (String url) {
+            _tabProgress[index]?.value = 0;
+            _tabIsLoading[index]?.value = true;
+            if ((_tabHasError[index] ?? false) && mounted) {
+              setState(() {
+                _tabHasError[index] = false;
+              });
+            }
+            // Watchdog: safeguard against silent hangs or stalled TCP connections
+            _tabTimeoutTimers[index]?.cancel();
+            _tabTimeoutTimers[index] = Timer(AppConfig.pageTimeout, () {
+              if (mounted && (_tabIsLoading[index]?.value ?? false)) {
+                _tabIsLoading[index]?.value = false;
+                setState(() {
+                  _tabHasError[index] = true;
+                });
+              }
+            });
+          },
+          onPageFinished: (String url) {
+            _tabTimeoutTimers[index]?.cancel();
+            _tabProgress[index]?.value = 100;
+            _tabIsLoading[index]?.value = false;
+            _tabsLoaded.add(index);
+
+            // Inject high-performance stylesheet optimizations without thread-blocking JS
+            _injectMobileOptimizations(controller);
+
+            // Notify readiness checker that a tab has finished rendering
+            _checkSplashReadiness();
+          },
+          onWebResourceError: (WebResourceError error) {
+            // Ignore cancelled, redirected, prevented, or non-fatal errors:
+            // - iOS WKWebView error code -999 (NSURLErrorCancelled) when switching tabs or external scheme launch
+            // - Android Chromium error code -3 (ERR_ABORTED) / -1 / net::ERR_ABORTED when navigation is redirected or prevented
+            // - net::ERR_UNKNOWN_URL_SCHEME (code -10) when custom scheme is handled externally
+            // - Non-fatal subresource blocks: ERR_BLOCKED_BY_CLIENT, ERR_CACHE_MISS
+            if (error.errorCode == -999 ||
+                error.errorCode == -3 ||
+                error.errorCode == -10 ||
+                error.description.contains('ERR_ABORTED') ||
+                error.description.contains('net::ERR_ABORTED') ||
+                error.description.contains('ERR_UNKNOWN_URL_SCHEME') ||
+                error.description.contains('ERR_BLOCKED_BY_CLIENT') ||
+                error.description.contains('ERR_CACHE_MISS')) {
+              return;
+            }
+
+            // CRITICAL FIX FOR WI-FI NETWORKS:
+            // Wi-Fi routers/DNS often experience transient timeouts or blocks on 3rd party sub-resources
+            // (e.g. Tourvisor widget, Yandex maps, analytics, custom fonts).
+            // Only fail the whole screen if the main frame itself failed to load.
+            final bool isMainFrame = error.isForMainFrame ?? false;
+            final String failedUrl = error.url?.toLowerCase() ?? '';
+            final bool isInternalTarget = failedUrl.isEmpty ||
+                AppConfig.internalHosts.any((String h) => failedUrl.contains(h.toLowerCase()));
+
+            if (!isMainFrame || !isInternalTarget) {
+              // Ignore non-main-frame or third-party asset network issues to avoid crashing the whole view
+              return;
+            }
+
+            _tabTimeoutTimers[index]?.cancel();
+            _tabIsLoading[index]?.value = false;
+            if (mounted) {
+              setState(() {
+                _tabHasError[index] = true;
+              });
+            }
+            // If home tab fails with network error, dismiss splash immediately so user sees ErrorScreen
+            if (index == 0) {
+              _dismissSplash();
+            }
+          },
+          onNavigationRequest: (NavigationRequest request) {
+            return UrlHandler.handleNavigationRequest(
+              request,
+              context: context,
+            );
+          },
+        );
+
+        if (navDelegate.platform is AndroidNavigationDelegate) {
+          (navDelegate.platform as AndroidNavigationDelegate).setOnSSlAuthError((error) {
+            error.proceed();
+          });
+        }
+
         controller
           ..setJavaScriptMode(JavaScriptMode.unrestricted)
           ..setBackgroundColor(AppConfig.lightBackgroundColor)
-          ..setNavigationDelegate(
-            NavigationDelegate(
-              onProgress: (int progress) {
-                _tabProgress[index]?.value = progress;
-                if (progress >= 100 && (_tabIsLoading[index]?.value ?? false)) {
-                  _tabIsLoading[index]?.value = false;
-                }
-              },
-              onPageStarted: (String url) {
-                _tabProgress[index]?.value = 0;
-                _tabIsLoading[index]?.value = true;
-                if ((_tabHasError[index] ?? false) && mounted) {
-                  setState(() {
-                    _tabHasError[index] = false;
-                  });
-                }
-                // Watchdog: safeguard against silent hangs or stalled TCP connections
-                _tabTimeoutTimers[index]?.cancel();
-                _tabTimeoutTimers[index] = Timer(AppConfig.pageTimeout, () {
-                  if (mounted && (_tabIsLoading[index]?.value ?? false)) {
-                    _tabIsLoading[index]?.value = false;
-                    setState(() {
-                      _tabHasError[index] = true;
-                    });
-                  }
-                });
-              },
-              onPageFinished: (String url) {
-                _tabTimeoutTimers[index]?.cancel();
-                _tabProgress[index]?.value = 100;
-                _tabIsLoading[index]?.value = false;
-                _tabsLoaded.add(index);
+          ..setUserAgent(AppConfig.customUserAgent)
+          ..setNavigationDelegate(navDelegate);
 
-                // Inject high-performance stylesheet optimizations without thread-blocking JS
-                _injectMobileOptimizations(controller);
-
-                // Notify readiness checker that a tab has finished rendering
-                _checkSplashReadiness();
-
-                // If splash has already concluded and user is on the main screen:
-                if (!_showSplash || _splashFading) {
-                  if (!_backgroundPreloadStarted) {
-                    _startBackgroundPreloading();
-                  } else if (index == _nextPreloadIndex) {
-                    // Previous background tab finished loading! Advance cleanly to the next tab.
-                    _backgroundPreloadTimer?.cancel();
-                    _nextPreloadIndex++;
-                    Timer(const Duration(milliseconds: 250), () {
-                      if (mounted) {
-                        _triggerNextBackgroundPreload();
-                      }
-                    });
-                  }
-                }
-              },
-              onWebResourceError: (WebResourceError error) {
-                // Ignore cancelled, redirected, prevented, or non-fatal errors:
-                // - iOS WKWebView error code -999 (NSURLErrorCancelled) when switching tabs or external scheme launch
-                // - Android Chromium error code -3 (ERR_ABORTED) / -1 / net::ERR_ABORTED when navigation is redirected or prevented
-                // - net::ERR_UNKNOWN_URL_SCHEME (code -10) when custom scheme is handled externally
-                // - Non-fatal subresource blocks: ERR_BLOCKED_BY_CLIENT, ERR_CACHE_MISS
-                if (error.errorCode == -999 ||
-                    error.errorCode == -3 ||
-                    error.errorCode == -10 ||
-                    error.description.contains('ERR_ABORTED') ||
-                    error.description.contains('net::ERR_ABORTED') ||
-                    error.description.contains('ERR_UNKNOWN_URL_SCHEME') ||
-                    error.description.contains('ERR_BLOCKED_BY_CLIENT') ||
-                    error.description.contains('ERR_CACHE_MISS')) {
-                  return;
-                }
-
-                _tabTimeoutTimers[index]?.cancel();
-
-                // Check if failure belongs to main frame or is a critical network disconnect
-                final bool isMainFrame = error.isForMainFrame ?? false;
-                final bool isCriticalNetworkFailure = error.errorCode == -2 || // ERR_NAME_NOT_RESOLVED
-                    error.errorCode == -6 || // ERR_CONNECTION_REFUSED
-                    error.errorCode == -8 || // ERR_CONNECTION_TIMED_OUT
-                    error.errorCode == -1009 || // NSURLErrorNotConnectedToInternet
-                    error.errorCode == -1003 || // NSURLErrorCannotFindHost
-                    error.errorCode == -1004; // NSURLErrorCannotConnectToHost
-
-                if (isMainFrame || (error.isForMainFrame == null && isCriticalNetworkFailure)) {
-                  _tabIsLoading[index]?.value = false;
-                  if (mounted) {
-                    setState(() {
-                      _tabHasError[index] = true;
-                    });
-                  }
-                  // If home tab fails with network error, dismiss splash immediately so user sees ErrorScreen
-                  if (index == 0) {
-                    _dismissSplash();
-                  }
-                }
-              },
-              onNavigationRequest: (NavigationRequest request) {
-                return UrlHandler.handleNavigationRequest(
-                  request,
-                  context: context,
-                );
-              },
-            ),
-          );
+        // Platform-specific configurations for Android WebView:
+        // 1. Enable mixed content mode (HTTP/HTTPS elements).
+        // 2. Allow third-party cookies required by Tourvisor module and DDoS protection.
+        if (controller.platform is AndroidWebViewController) {
+          final AndroidWebViewController androidController =
+              controller.platform as AndroidWebViewController;
+          androidController.setMixedContentMode(MixedContentMode.alwaysAllow);
+          final AndroidWebViewCookieManager cookieManager =
+              WebViewCookieManager().platform as AndroidWebViewCookieManager;
+          cookieManager.setAcceptThirdPartyCookies(androidController, true);
+        }
       } else {
         _tabIsLoading[index]?.value = false;
       }
@@ -630,45 +636,6 @@ class _WebViewScreenState extends State<WebViewScreen> {
     setState(() {
       _splashFading = true;
     });
-
-    // Start background preloading of remaining tabs (1, 2, 3, 4) while user is on Home screen
-    _startBackgroundPreloading();
-  }
-
-  /// Sequentially preloads remaining navigation tabs in the background
-  /// one-by-one as each previous tab finishes loading, while the user
-  /// is actively viewing the main Home screen.
-  void _startBackgroundPreloading() {
-    if (_backgroundPreloadStarted || _isDesktopPlatform || !mounted) return;
-    _backgroundPreloadStarted = true;
-    _triggerNextBackgroundPreload();
-  }
-
-  void _triggerNextBackgroundPreload() {
-    if (!mounted) return;
-
-    // Find the next uninitialized tab index (1 -> 2 -> 3 -> 4)
-    while (_nextPreloadIndex < AppBottomNavBar.navItems.length &&
-        _tabInitialized.contains(_nextPreloadIndex)) {
-      _nextPreloadIndex++;
-    }
-
-    if (_nextPreloadIndex >= AppBottomNavBar.navItems.length) {
-      return; // All tabs have finished loading in memory!
-    }
-
-    final int targetIndex = _nextPreloadIndex;
-    _initTabController(targetIndex);
-
-    // Safety watchdog: if a background tab takes longer than 4.0s,
-    // advance to the next tab anyway so the queue never stalls.
-    _backgroundPreloadTimer?.cancel();
-    _backgroundPreloadTimer = Timer(const Duration(milliseconds: 4000), () {
-      if (mounted && _nextPreloadIndex == targetIndex) {
-        _nextPreloadIndex++;
-        _triggerNextBackgroundPreload();
-      }
-    });
   }
 
   @override
@@ -713,6 +680,18 @@ class _WebViewScreenState extends State<WebViewScreen> {
                         children: List<Widget>.generate(
                           AppBottomNavBar.navItems.length,
                           (int index) {
+                            if (kIsWeb) {
+                              return KeyedSubtree(
+                                key: ValueKey<int>(index),
+                                child: SizedBox.expand(
+                                  child: buildPlatformWebView(
+                                    url: AppBottomNavBar.navItems[index].url,
+                                    tabIndex: index,
+                                  ),
+                                ),
+                              );
+                            }
+
                             if (!_tabInitialized.contains(index) ||
                                 _controllers[index] == null) {
                               return KeyedSubtree(
@@ -888,6 +867,13 @@ class _WebViewScreenState extends State<WebViewScreen> {
                     width: 72,
                     height: 72,
                     fit: BoxFit.contain,
+                    errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
+                      return const Icon(
+                        Icons.travel_explore_rounded,
+                        size: 48,
+                        color: AppConfig.primaryColor,
+                      );
+                    },
                   ),
                 ),
                 const SizedBox(height: 20),
