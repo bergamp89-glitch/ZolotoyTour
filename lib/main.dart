@@ -2,8 +2,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'app.dart';
+import 'services/notification_service.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Catch and log Flutter framework errors gracefully to prevent sudden crashes
@@ -24,6 +25,9 @@ void main() {
       statusBarIconBrightness: Brightness.dark,
     ),
   );
+
+  // Initialize local notifications service for automated weekly travel deals
+  await NotificationService.instance.initialize();
 
   runApp(const ZolotoyTourApp());
 }

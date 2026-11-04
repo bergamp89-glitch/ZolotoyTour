@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
     <base-config cleartextTrafficPermitted="false">
         <trust-anchors>
@@ -8,8 +8,6 @@
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">zolotoytouruz.uz</domain>
         <domain includeSubdomains="true">tourvisor.ru</domain>
-        <domain includeSubdomains="true">yandex.ru</domain>
-        <domain includeSubdomains="true">googleapis.com</domain>
         <trust-anchors>
             <certificates src="system" />
         </trust-anchors>

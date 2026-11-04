@@ -57,6 +57,8 @@ class _ErrorScreenState extends State<ErrorScreen> {
                     'assets/images/logo.png',
                     height: 52,
                     fit: BoxFit.contain,
+                    filterQuality: FilterQuality.high,
+                    isAntiAlias: true,
                     errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
                       return const SizedBox.shrink();
                     },

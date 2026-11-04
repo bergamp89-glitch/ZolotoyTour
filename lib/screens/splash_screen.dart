@@ -177,6 +177,8 @@ class _SplashScreenState extends State<SplashScreen>
                             width: logoSize,
                             height: logoSize,
                             fit: BoxFit.contain,
+                            filterQuality: FilterQuality.high,
+                            isAntiAlias: true,
                             errorBuilder: (BuildContext context, Object error,
                                 StackTrace? stackTrace) {
                               return const Icon(

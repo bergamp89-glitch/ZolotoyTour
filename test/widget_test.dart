@@ -8,6 +8,8 @@ import 'package:zolotoytour/screens/splash_screen.dart';
 import 'package:zolotoytour/screens/webview_screen.dart';
 import 'package:zolotoytour/utils/url_handler.dart';
 import 'package:zolotoytour/widgets/app_bottom_nav_bar.dart';
+import 'package:zolotoytour/widgets/app_top_bar.dart';
+import 'package:zolotoytour/services/notification_service.dart';
 
 void main() {
   group('AppConfig & UrlHandler Tests', () {
@@ -511,6 +513,153 @@ void main() {
       } finally {
         debugDefaultTargetPlatformOverride = null;
       }
+    });
+  });
+
+  group('AppTopBar Widget Tests', () {
+    testWidgets('AppTopBar renders brand logo, title, and responds to refresh and call actions', (WidgetTester tester) async {
+      bool refreshTapped = false;
+      bool callTapped = false;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            appBar: AppTopBar(
+              currentIndex: 0,
+              onRefresh: () => refreshTapped = true,
+              onCall: () => callTapped = true,
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text(AppConfig.appName), findsOneWidget);
+      expect(find.text('Главная страница'), findsOneWidget);
+      expect(find.byType(Image), findsOneWidget);
+
+      // Tap hidden refresh on brand logo
+      await tester.tap(find.byTooltip('Обновить / Yangilash'));
+      await tester.pump();
+      expect(refreshTapped, isTrue);
+
+      // Tap call
+      await tester.tap(find.byIcon(Icons.phone_in_talk_rounded));
+      await tester.pump();
+      expect(callTapped, isTrue);
+    });
+
+    testWidgets('AppTopBar displays correct subtitle for Kontakty tab (index 4)', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            appBar: AppTopBar(
+              currentIndex: 4,
+              onRefresh: () {},
+              onCall: () {},
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('Контакты и адрес офиса'), findsOneWidget);
+    });
+
+    testWidgets('AppTopBar displays progress indicator when loading', (WidgetTester tester) async {
+      final ValueNotifier<bool> isLoading = ValueNotifier<bool>(true);
+      final ValueNotifier<int> progress = ValueNotifier<int>(45);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            appBar: AppTopBar(
+              currentIndex: 0,
+              onRefresh: () {},
+              onCall: () {},
+              isLoadingNotifier: isLoading,
+              progressNotifier: progress,
+            ),
+          ),
+        ),
+      );
+
+      expect(find.byType(LinearProgressIndicator), findsOneWidget);
+
+      isLoading.value = false;
+      await tester.pump();
+      expect(find.byType(LinearProgressIndicator), findsNothing);
+
+      isLoading.dispose();
+      progress.dispose();
+    });
+
+    testWidgets('AppTopBar adapts cleanly to ultra-narrow screen (280px)', (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(280, 500);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            appBar: AppTopBar(
+              currentIndex: 4,
+              onRefresh: () {},
+              onCall: () {},
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text(AppConfig.appName), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('AppTopBar logo acts as hidden refresh button and triggers onRefresh', (WidgetTester tester) async {
+      bool refreshTapped = false;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            appBar: AppTopBar(
+              currentIndex: 0,
+              onRefresh: () => refreshTapped = true,
+              onCall: () {},
+            ),
+          ),
+        ),
+      );
+
+      final Finder logoFinder = find.byTooltip('Обновить / Yangilash');
+      expect(logoFinder, findsOneWidget);
+
+      await tester.tap(logoFinder);
+      await tester.pump();
+      expect(refreshTapped, isTrue);
+    });
+  });
+
+  group('NotificationService Tests', () {
+    test('NotificationService has proper Russian notification texts and configuration', () {
+      expect(NotificationService.channelId, equals('weekly_travel_deals'));
+      expect(NotificationService.weeklyNotificationId, equals(777));
+      expect(NotificationService.weeklyTitle, contains('Горящие туры'));
+      expect(NotificationService.weeklyBody, contains('Турции, ОАЭ и Египте'));
+    });
+
+    test('NotificationService singleton initializes without throwing exceptions', () async {
+      final NotificationService service = NotificationService.instance;
+      expect(service, isNotNull);
+      // Ensure initialize and requestPermission handle safely in test environment
+      await service.initialize();
+      expect(service, isNotNull);
+    });
+
+    test('NotificationService calculates next Friday at 08:00 AM correctly', () async {
+      await NotificationService.instance.initialize();
+      final fridayDate = NotificationService.nextInstanceOfFridayEightAM();
+      expect(fridayDate.weekday, equals(DateTime.friday));
+      expect(fridayDate.hour, equals(8));
+      expect(fridayDate.minute, equals(0));
     });
   });
 }

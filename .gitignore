@@ -50,3 +50,8 @@ app.*.map.json
 key.properties
 **/key.properties
 **/android/keystore/*.jks
+
+# Gradle & Kotlin caches
+.gradle/
+**/android/.gradle/
+**/android/.kotlin/

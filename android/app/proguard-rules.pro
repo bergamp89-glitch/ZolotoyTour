@@ -17,6 +17,10 @@
 # Keep url_launcher plugin
 -keep class io.flutter.plugins.urllauncher.** { *; }
 
+# Keep flutter_local_notifications plugin
+-keep class com.dexterous.flutterlocalnotifications.** { *; }
+-dontwarn com.dexterous.flutterlocalnotifications.**
+
 # Prevent obfuscation of classes referenced via reflection
 -keepattributes *Annotation*
 -keepattributes Signature

@@ -5,8 +5,10 @@ import 'package:flutter/services.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
 import '../config/app_config.dart';
+import '../services/notification_service.dart';
 import '../utils/url_handler.dart';
 import '../widgets/app_bottom_nav_bar.dart';
+import '../widgets/app_top_bar.dart';
 import '../widgets/web_view_fallback.dart';
 import 'error_screen.dart';
 import 'splash_screen.dart';
@@ -205,7 +207,8 @@ class _WebViewScreenState extends State<WebViewScreen> {
 
         if (navDelegate.platform is AndroidNavigationDelegate) {
           (navDelegate.platform as AndroidNavigationDelegate).setOnSSlAuthError((error) {
-            error.proceed();
+            // Strictly adhere to Google Play Store security requirements by not bypassing SSL checks
+            debugPrint('SSL Authentication error encountered: $error');
           });
         }
 
@@ -286,10 +289,7 @@ class _WebViewScreenState extends State<WebViewScreen> {
             margin: 0 !important;\
             pointer-events: none !important;\
           }\
-          /* Responsive Map Styling */\
-          iframe[src*="yandex"],\
-          iframe[src*="maps"],\
-          iframe[src*="constructor"],\
+          /* Enhanced Responsive Map Styling for Kontakty Section */\
           #map,\
           #ymap,\
           #yandex-map,\
@@ -303,25 +303,39 @@ class _WebViewScreenState extends State<WebViewScreen> {
           .map-responsive,\
           .contact-map,\
           .contacts-map,\
-          ymaps.ymaps-2-1-79-map,\
-          ymaps[class*="-map"] {\
-            height: clamp(190px, 30vh, 240px) !important;\
-            max-height: 240px !important;\
-            min-height: 180px !important;\
+          iframe[src*="yandex"],\
+          iframe[src*="maps"],\
+          iframe[src*="constructor"] {\
+            display: block !important;\
+            visibility: visible !important;\
+            opacity: 1 !important;\
             width: 100% !important;\
             max-width: 100% !important;\
-            border-radius: 16px !important;\
+            height: clamp(340px, 48vh, 460px) !important;\
+            min-height: 320px !important;\
+            max-height: 520px !important;\
+            border-radius: 18px !important;\
             overflow: hidden !important;\
-            margin: 10px auto 14px auto !important;\
-            box-shadow: 0 4px 18px rgba(0,0,0,0.12) !important;\
+            margin: 14px auto 16px auto !important;\
+            box-shadow: 0 6px 24px rgba(0,0,0,0.12) !important;\
+            border: 1.5px solid rgba(210,162,88,0.35) !important;\
             box-sizing: border-box !important;\
+            position: relative !important;\
+            z-index: 1 !important;\
+          }\
+          #map ymaps,\
+          #map canvas {\
+            max-width: none !important;\
           }\
           /* Contact Details section */\
           .contact-address, .contact-info, .contact-details, .contacts, .contact, .custom_contacts {\
-            padding: 14px 16px !important;\
-            margin: 8px auto !important;\
+            padding: 16px 18px !important;\
+            margin: 12px auto !important;\
             border-radius: 14px !important;\
-            line-height: 1.5 !important;\
+            line-height: 1.6 !important;\
+            background: #ffffff !important;\
+            border: 1px solid #eeeeee !important;\
+            box-shadow: 0 2px 12px rgba(0,0,0,0.05) !important;\
             box-sizing: border-box !important;\
           }\
           body, .container, .main-content, #content, .content-inner {\
@@ -355,6 +369,28 @@ class _WebViewScreenState extends State<WebViewScreen> {
             min-height: 0 !important;\
           }';
         document.head.appendChild(style);
+
+        // Ensure Yandex Map renders tiles properly and add quick navigation helper
+        function setupMapVisibility() {
+          var mapEl = document.getElementById('map') || document.querySelector('.contact-map') || document.querySelector('.contacts-map');
+          if (mapEl) {
+            mapEl.style.minHeight = '320px';
+            if (!document.getElementById('flutter-map-nav-btn')) {
+              var navBtn = document.createElement('a');
+              navBtn.id = 'flutter-map-nav-btn';
+              navBtn.href = 'https://yandex.uz/maps/?rtext=~41.0079862,71.666212';
+              navBtn.target = '_blank';
+              navBtn.innerHTML = '📍 Открыть на Яндекс Картах (Навигатор)';
+              navBtn.style.cssText = 'display:flex;align-items:center;justify-content:center;margin:12px auto 24px auto;padding:12px 20px;background:#D2A258;color:#1E1E1E;font-weight:700;font-size:14px;border-radius:12px;text-decoration:none;box-shadow:0 4px 14px rgba(210,162,88,0.3);text-align:center;max-width:340px;';
+              mapEl.parentNode.insertBefore(navBtn, mapEl.nextSibling);
+            }
+            setTimeout(function() { window.dispatchEvent(new Event('resize')); }, 300);
+            setTimeout(function() { window.dispatchEvent(new Event('resize')); }, 1000);
+          }
+        }
+        setupMapVisibility();
+        setTimeout(setupMapVisibility, 600);
+        setTimeout(setupMapVisibility, 1800);
       })();
     ''').catchError((_) {});
   }
@@ -638,10 +674,19 @@ class _WebViewScreenState extends State<WebViewScreen> {
     });
   }
 
+  /// Prompts the user for notification permissions and schedules automated weekly travel deals.
+  void _requestNotificationPermissionAfterSplash() {
+    if (_isPureDesktopPlatform || kIsWeb) return;
+    // Delay prompt slightly so the user is comfortably viewing the main screen first
+    Future<void>.delayed(const Duration(milliseconds: 1200), () {
+      if (mounted) {
+        NotificationService.instance.requestPermission();
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    final double statusBarHeight = MediaQuery.paddingOf(context).top;
-
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
@@ -665,17 +710,24 @@ class _WebViewScreenState extends State<WebViewScreen> {
           children: <Widget>[
             Scaffold(
               backgroundColor: AppConfig.lightBackgroundColor,
+              appBar: AppTopBar(
+                currentIndex: _currentTabIndex,
+                onRefresh: _refreshCurrentTab,
+                onCall: () {
+                  UrlHandler.launchExternal(
+                    Uri.parse('tel:${AppConfig.contactPhone}'),
+                  );
+                },
+                onCallLongPress: _showQuickContactSheet,
+                isLoadingNotifier: _tabIsLoading[_currentTabIndex],
+                progressNotifier: _tabProgress[_currentTabIndex],
+              ),
               body: SafeArea(
                 top: false,
                 bottom: false,
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: <Widget>[
-                    // Multi-tab lazy caching container: instant switching without reloading
-                    if (!_isWebViewSupported)
-                      SafeArea(child: _buildDesktopFallbackView(context))
-                    else
-                      IndexedStack(
+                child: (!_isWebViewSupported)
+                    ? _buildDesktopFallbackView(context)
+                    : IndexedStack(
                         index: _currentTabIndex,
                         children: List<Widget>.generate(
                           AppBottomNavBar.navItems.length,
@@ -721,68 +773,7 @@ class _WebViewScreenState extends State<WebViewScreen> {
                           },
                         ),
                       ),
-
-                    // Top Progress Indicator isolated to current active tab
-                    if (_isWebViewSupported &&
-                        _tabIsLoading.containsKey(_currentTabIndex) &&
-                        _tabProgress.containsKey(_currentTabIndex))
-                      ValueListenableBuilder<bool>(
-                        valueListenable: _tabIsLoading[_currentTabIndex]!,
-                        builder: (BuildContext context, bool isLoading, _) {
-                          if (!isLoading || (_tabHasError[_currentTabIndex] ?? false)) {
-                            return const SizedBox.shrink();
-                          }
-                          return Positioned(
-                            top: statusBarHeight,
-                            left: 0,
-                            right: 0,
-                            child: ValueListenableBuilder<int>(
-                              valueListenable: _tabProgress[_currentTabIndex]!,
-                              builder: (BuildContext context, int progress, _) {
-                                return LinearProgressIndicator(
-                                  value: progress > 0 ? progress / 100.0 : null,
-                                  backgroundColor: Colors.transparent,
-                                  valueColor: const AlwaysStoppedAnimation<Color>(
-                                    AppConfig.primaryColor,
-                                  ),
-                                  minHeight: 2.5,
-                                );
-                              },
-                            ),
-                          );
-                        },
-                      ),
-                  ],
-                ),
               ),
-              // Floating refresh button: replaces non-functional RefreshIndicator
-              // Shows only when WebView is loaded and there's no error
-              floatingActionButton: (!_showSplash &&
-                      _isWebViewSupported &&
-                      !kIsWeb &&
-                      !(_tabHasError[_currentTabIndex] ?? false))
-                  ? Padding(
-                      // Position lowered by ~1cm (~40dp) below status bar for better accessibility
-                      padding: EdgeInsets.only(top: statusBarHeight + 44),
-                      child: SizedBox(
-                        width: 32,
-                        height: 32,
-                        child: FloatingActionButton(
-                          heroTag: 'refresh_fab',
-                          mini: true,
-                          elevation: 2,
-                          backgroundColor: Colors.white.withValues(alpha: 0.92),
-                          onPressed: _refreshCurrentTab,
-                          child: const Icon(
-                            Icons.refresh_rounded,
-                            color: AppConfig.primaryColor,
-                            size: 18,
-                          ),
-                        ),
-                      ),
-                    )
-                  : null,
-              floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
               bottomNavigationBar: AppBottomNavBar(
                 currentIndex: _currentTabIndex,
                 onTap: _onTabTapped,
@@ -804,6 +795,7 @@ class _WebViewScreenState extends State<WebViewScreen> {
                         setState(() {
                           _showSplash = false;
                         });
+                        _requestNotificationPermissionAfterSplash();
                       }
                     },
                     child: SplashScreen(
@@ -867,6 +859,8 @@ class _WebViewScreenState extends State<WebViewScreen> {
                     width: 72,
                     height: 72,
                     fit: BoxFit.contain,
+                    filterQuality: FilterQuality.high,
+                    isAntiAlias: true,
                     errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
                       return const Icon(
                         Icons.travel_explore_rounded,
